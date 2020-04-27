@@ -1,1 +1,111 @@
+from bs4 import BeautifulSoup
+import requests
+# Final
+
+import re
+#Format it
+def format1(a, key):
+    list_all = {}
+    a1 = re.findall(r'<[^>]*>.*?</[^>]*>(?:<[^>]*/>)?|[^<>]+', a)
+    list_all[key] = a1
+    return list_all
+
+
+# extract the necessary information
+TAG_RE = re.compile(r'<[^>]+>')
+def remove_tags(text):
+    return TAG_RE.sub('', text)
+
+def extract(a1):
+    print("----Extract")
+    temp = []
+    temp1 = []
+    temp2 = []
+    temp_reviews = []
+    for i in range(len(a1)):
+        if re.search('<div class="pc">+', a1[i]):
+            s = remove_tags(a1[i])
+            temp.append(s)
+        if re.search('<td class="bj bp">+', a1[i]):
+            s = remove_tags(a1[i])
+            temp.append(s)
+        if re.search('<td class="ar arp">+', a1[i]):
+            # Курсов , WMBL , ACTS , PMTS
+            s = remove_tags(a1[i])
+            temp1.append(s)
+        if re.search('<td class="rw+', a1[i]):
+            # Отзывы нег Отзывы поз
+            s = remove_tags(a1[i])
+            temp_reviews.append(s)
+        if re.search('onclick="ccl+', a1[i]):
+            s = remove_tags(a1[i])
+            s = s[s.find("(") + 1:s.find(")")]
+            temp2.append(s)
+        match = re.search(r'href=[\'"]?([^\'" >]+)', a1[i])
+        if match:
+            #print(match.group(1))
+            temp2.append(match.group(1))
+
+    temp.append(temp1)
+    for i in temp_reviews:
+        if i == "":
+            temp_reviews.remove(i)
+    temp.append(temp_reviews)
+   # print(temp)
+   # print(temp2)
+    dict = {}
+    dict["Обменик"] = temp[0]
+    dict["Статус"] = temp[1]
+    dict["Резервы"] = temp[2][0]
+    dict["Курсов"] = temp[2][1]
+    dict["WMBL"] = temp[2][2]
+    dict["ACTS"] = temp[2][3]
+    dict["PMTS"] = temp[2][4]
+    dict["Негативгые_Отзывы"] = temp[3][0]
+    dict["Позитивные_Отзывы"] = temp[3][1]
+    dict["ID"] = temp2[0]
+    dict["Отзывы"] = temp2[-1]
+    #print(dict)
+    return dict
+
+#print(len(f))
+"""
+for x in range(0,len(f)): # extract from all except from the last
+    print("-------")
+    print( f[x])
+"""
+
+def main():
+    # main
+    url = "https://www.bestchange.ru/list.html"
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'lxml')
+    seek = soup.find('table',id="content_table")
+    seek = soup.find('tbody')
+
+    # The first tr contains the field names.
+    f = []
+    headings = [f.append(str(th)) for th in seek.find_all('tr')]
+    dict = {}
+    count = 0
+    for e in f:
+        count +=1
+        dict[count] = e
+
+    #if __name__ == "__main__":
+    new_temp = []
+    for x in range(0,len(f), 2): # delete rows which arent needed
+        if x <= len(f):
+            new_temp.append(f[x])
+
+    print(len(new_temp))
+    dict_main = {}
+    for x in range(0,len(new_temp)): # extract data
+        #print("-------")
+        s = format1(new_temp[x], x)
+        dict_main[x] = extract(s[x])
+        #print(x, extract(s[x]))
+    print(dict_main)
+    return dict_main
+
 
