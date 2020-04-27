@@ -15,11 +15,11 @@
 
 Create: 
 ```
-create_table
-data_entry
-create_insert_commands
+create_table - create database
+data_entry - inserts data from .sql file 
+create_insert_commands - creates .sql file with "insert" requests
 ```
 Update: 
 ```
-updateSqliteTable
+updateSqliteTable - updates database
 ```
