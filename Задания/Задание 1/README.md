@@ -19,6 +19,10 @@ create_table - create database
 data_entry - inserts data from .sql file 
 create_insert_commands - creates .sql file with "insert" requests
 ```
+INSERT INTO mytable ( `Обменик`, `Статус`, `Резервы`, `Курсов`, `WMBL`, `ACTS`, `PMTS`, `Негативгые_Отзывы`, `Позитивные_Отзывы`, `ID`, `Отзывы` ) VALUES ( 'NetEx24', 'Работает', '$726 378', '216', '—', '—', '1930', '0', '16862', '546', 'https:__www.bestchange.ru_netex24-exchanger.html' );
+INSERT INTO mytable ( `Обменик`, `Статус`, `Резервы`, `Курсов`, `WMBL`, `ACTS`, `PMTS`, `Негативгые_Отзывы`, `Позитивные_Отзывы`, `ID`, `Отзывы` ) VALUES ( 'WmExpress', 'Работает', '$105 187', '385', '—', '—', '—', '0', '12402', '528', 'https:__www.bestchange.ru_wmexpress-exchanger.html' );
+```
+```
 Update: 
 ```
 updateSqliteTable - updates database
