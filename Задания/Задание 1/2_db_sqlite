@@ -1,0 +1,72 @@
+import sqlite3
+import bestchange_web_scraper as wb
+
+
+def create_insert_commands(dict_main):
+    f = open("test.sql", "w", encoding="UTF-8")
+    for mydict in range(0,len(dict_main)): # extract data
+        #print(dict_main[mydict])
+        columns = ', '.join("`" + str(x).replace('/', '_') + "`" for x in dict_main[mydict].keys())
+        values = ', '.join("'" + str(x).replace('/', '_') + "'" for x in dict_main[mydict].values())
+        sql = "INSERT INTO %s ( %s ) VALUES ( %s );" % ('mytable', columns, values)
+        #f = open("test.sql", "a", encoding="windows-1251" )
+        f.write(sql + "\n")
+    f.close()
+
+
+def create_table(name):
+    conn = sqlite3.connect(name)
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS mytable(Обменик text,Статус text, Резервы text, Курсов text, WMBL text, ACTS text ,PMTS text , Негативгые_Отзывы text ,Позитивные_Отзывы text ,ID text ,Отзывы text)')
+    c.close()
+    conn.close()
+
+def data_entry(name,dict_main):
+    conn = sqlite3.connect(name)
+    c = conn.cursor()
+    create_insert_commands(dict_main)
+    f = open("C:\\Users\\khini\\PycharmProjects\\untitled1\\test.sql", "r", encoding="UTF-8")
+    #c.execute("INSERT INTO mytable(`Обменик`, `Статус`, `Резервы`, `Курсов`, `WMBL`, `ACTS`, `PMTS`, `Негативгые_Отзывы`, `Позитивные_Отзывы`,  `ID`, `Отзывы`) VALUES('NetEx24', 'Работает', '$743 530', '246', '—', '—', '1930', '0', '16860', '546',  'https:__www.bestchange.ru_netex24-exchanger.html')")
+    for line in f:
+       #print(line)
+       c.execute(line)
+    conn.commit()
+    c.close()
+    conn.close()
+
+def updateSqliteTable(name, dict_main):
+    try:
+        conn = sqlite3.connect(name)
+        c = conn.cursor()
+        print("Connected to %s" % name)
+
+        sql_update_query = """Update mytable set Статус = ?, Резервы = ?, Курсов = ?, WMBL = ?, ACTS = ?, PMTS = ?, 
+        Негативгые_Отзывы = ?, Позитивные_Отзывы = ?, ID = ?, Отзывы = ?
+        where Обменик = ?"""
+        for mydict in range(0, len(dict_main)):  # extract data
+            print(dict_main[mydict])
+            which = (dict_main[mydict]['Обменик'])
+            what =  (dict_main[mydict]['Статус'], dict_main[mydict]['Резервы'],dict_main[mydict]['Курсов'],dict_main[mydict]['WMBL'],
+                     dict_main[mydict]['ACTS'],dict_main[mydict]['PMTS'], dict_main[mydict]['Негативгые_Отзывы'],
+                     dict_main[mydict]['Позитивные_Отзывы'],dict_main[mydict]['ID'],dict_main[mydict]['Отзывы'],dict_main[mydict]['Обменик'])
+            data = (what)
+            c.execute(sql_update_query, data)
+        conn.commit()
+        print("Record Updated successfully")
+        c.close()
+
+    except sqlite3.Error as error:
+        print("Failed to update sqlite table", error)
+    finally:
+        if (conn):
+            conn.close()
+            print("The sqlite connection is closed")
+
+if __name__ == "__main__":
+    dict_main = {}
+    dict_main = wb.main()
+    name = "data1.db"
+    #create_table(name)
+    #data_entry(name, dict_main)
+    create_insert_commands(dict_main)
+    #updateSqliteTable(name, dict_main)
