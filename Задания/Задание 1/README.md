@@ -13,14 +13,11 @@
 ID обменника в системе blockchain: 324qt2323
 Имя : Name
 email: email
-email: email@gmail.com
+Enter Valid email: email@gmail.com
 текст отзыва: Review
 номер обмена: 34t234
 (1 - положительный, 2 -нейтральный, 3 - отрецательный)
-тип отзыва: 4
-Enter Valid Review Type
-(1 - положительный, 2 -нейтральный, 3 - отрецательный)
-тип отзыва: 1
+тип отзыва: 2
 ```
 ## .CSV file
 ![adfgvd](https://user-images.githubusercontent.com/48917675/80627132-49bf5680-8a04-11ea-87d9-31ccff4bdab0.jpg)
