@@ -1,0 +1,80 @@
+import pandas as pd
+
+# Check if Email is valid way 1
+from validate_email import validate_email
+#is_valid = validate_email('example@example.com')
+#print(is_valid)
+
+# Check if Email is valid way 2
+import re
+def is_valid_email(email):
+    if len(email) > 7:
+         return bool(re.match(
+           "^.+@(\[?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$", email))
+#is_valid = is_valid_email('example@example.com')
+#print(is_valid)
+
+# User Input
+def user_input():
+    ID_blockchain = str(input('ID обменника в системе blockchain: '))
+    Name = str(input('Имя : '))
+    # Check if Email is valid
+    email = str(input('email: '))
+    while validate_email(email) == False:
+        email = str(input('email: '))
+        #print(is_valid)
+    text_review = str(input('текст отзыва: '))
+    Exchange_ID = str(input('номер обмена: '))
+    review_type =int(input('(1 - положительный, 2 -нейтральный, 3 - отрецательный)' '\n' 'тип отзыва: '))
+    while  review_type not in [1,2,3]:
+        print("Enter Valid Review Type")
+        review_type = int(input('(1 - положительный, 2 -нейтральный, 3 - отрецательный)' '\n' 'тип отзыва: '))
+    temp_list = [ID_blockchain, Name, email,text_review, Exchange_ID, review_type]
+    return temp_list
+
+def add_to_df(review_logs, column_names,temp_list ):
+    # Add row to Dataframe - Way 1
+    lst_dict = []
+    lst_dict.append(dict(zip(column_names, temp_list)))
+    review_logs = review_logs.append(lst_dict)
+    """
+       # Add row to Dataframe - Way 2
+       review_logs = review_logs.append(
+           {'ID_blockchain': ID_blockchain, 'Name': Name, "email": email, "text_review": text_review,
+            "Exchange_ID": Exchange_ID, "review_type": review_type
+            }, ignore_index=True)
+    """
+    return review_logs
+
+def append_to_csv(review_logs, filename):
+    review_logs.to_csv(r'%s' % filename,  mode='a', index=False, header=False, encoding='utf-8')
+
+
+def return_data_as_html_table(filename):
+    df1 = pd.read_csv(filename, delimiter = ',' )
+    pd.set_option('colheader_justify', 'center')   # FOR TABLE <th>
+
+    html_string = '''
+    <html>
+      <head><title>HTML Pandas Dataframe with CSS</title></head>
+      <link rel="stylesheet" type="text/css" href="df_style.css"/>
+      <body>
+        {table}
+      </body>
+    </html>.
+    '''
+    # OUTPUT AN HTML FILE
+    with open('myhtml.html', 'w',encoding='utf-8') as f:
+        f.write(html_string.format(table=df1.to_html(classes='mystyle')))
+
+
+if __name__ == "__main__":
+    # Create Table
+    column_names = ["ID_blockchain", "Name", "email", "text_review", "Exchange_ID", "review_type"]
+    review_logs = pd.DataFrame(columns=column_names)
+    filename = "review_logs.csv"
+    # Run
+    temp_list = user_input()
+    review_logs = add_to_df(review_logs, column_names, temp_list)
+    append_to_csv(review_logs,filename)
+    return_data_as_html_table(filename)
