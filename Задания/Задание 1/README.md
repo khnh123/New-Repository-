@@ -1,9 +1,8 @@
 # Read Me Template
 
 
-
 ---
-### Installing
+### Run
 
 Задание 2 
 1. takes user's input 
@@ -28,9 +27,10 @@ Enter Valid Review Type
 
 
 ## Visualize Data as html
+def return_data_as_html_table() - function 
+
+df_style.css - file for styling
 ![adf](https://user-images.githubusercontent.com/48917675/80627428-bb97a000-8a04-11ea-8012-7b703c0b2050.jpg)
 
-def return_data_as_html_table() - function 
-df_style.css - file for styling
 
 
