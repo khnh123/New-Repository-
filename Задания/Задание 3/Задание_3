@@ -7,13 +7,12 @@ def format(file_with_text):
     Split text by "\n" newline
     """
     list1 =  []
-    #str1 = ''
     #t = re.compile(r'.(?=^\n+)')
     for x in file_with_text:
-        if x != "\n":
-            list1.append(x)
-            for e in range(len(list1)):
-                list1[e] = list1[e].replace('\n', "")
+        x = re.split(r'(?<=[\.\!\?])\s*', x)
+        list1.append(x)
+            #for e in range(len(list1)):
+            #    list1[e] = list1[e].replace('\n', "")
     return list1
 
 def check(lista):
@@ -36,35 +35,34 @@ def split_text(list1):
     Split text by words
     """
     list2 = []
-    for i in range(len(list1)):
-        s = re.findall('.*?[.!\?]',list1[i])
-        for i1 in range(len(s)):
-            s1 = s[i1].split(' ')
-            for i2 in range(len(s1)):
-                list2.append(s1[i2])
-        return list2
+    for i in list1:
+        for i1 in range(len(i)):
+            s = i[i1].split(" ")
+            for i2 in s:
+                list2.append(i2)
+    return list2
 
 def headers(list1):
     """
     return 3 headers
     """
     temp = []
-    #regex = r'\b\w+\b'
-    for i in range(len(list1)):
-        s = list1[i].split('.')
-        for i1 in range(len(s)):
-            header_tmp = []
-            indexes = []
-            s2 = check(s[i1].split(' '))
-            for word in s2:
-                    word = re.findall(r'\b\w+\b', word)
-                    if (len(''.join(header_tmp))+len(word[0])) < 30:
-                        header_tmp.append(word[0])
-            indexes.append(split_text(list1).index(header_tmp[0]))
-            if len(temp) >= 3: # need 3 headers
-                return temp
+    for i in list1:
+        i = ''.join(i)
+        s2 = check(i.split(' '))
+        header_tmp = []
+        for word in s2:
+            check_word = re.findall(r'\b\w+\b', word)
+            if len(check_word) > 0:
+                if check_word[0].lower() not in stop_words:
+                    if (len(''.join(header_tmp)) + len(check_word[0])) < 30:
+                        header_tmp.append(word)
+        if len(temp) >= 3:  # need 3 headers
+            return temp
+        if len(' '.join(header_tmp)) > 0:
             temp.append(' '.join(header_tmp))
     return temp
+
 
 def header_indexes(headers_3):
     """
@@ -77,27 +75,37 @@ def header_indexes(headers_3):
        indexes.append(split_text(list1).index(h))
     return indexes
 
-def descriptions(list1,headers_3):
+def descriptions(list1, headers_3):
     """
         return descriptions
     """
     desc = []
     text = split_text(list1)
-    #print(text)
     indexes = header_indexes(headers_3) # need start index of the header in text
     loc = indexes[0]
     for index in indexes:
         if index < loc: # descriptions do not intersect
             continue
         temp = []
+        a = []
         for i in range(index, len(text)):  # start from the index
-            if text[i] in '' and len(''.join(temp)) >= 84: # limit 84 char
-                break
-            elif text[i] != '':
-                temp.append(text[i])
-                loc = text.index(temp[-1])
-        #print(*temp, len(''.join(temp)))
-        desc.append(' '.join(temp))
+            if text[i].lower() not in stop_words:
+                if re.match(r'\b\w+\b', text[i]) and len(''.join(temp)) >= 84: # limit 84 char
+                    break
+                elif text[i] != '':
+                    temp.append(text[i])
+                    loc = text.index(temp[-1])
+                #print(a)
+                a = ' '.join(temp).split(".")
+                for i in range(len(a)):
+                    if len(a[i]) > 1:
+                        if a[i][0] != " ":
+                            a[i] = a[i][0][0].upper() + a[i][0:][1:] # make first letter uppercase
+                        else:
+                            a[i] = a[i][1][0].upper() + a[i][1:][1:] # make first letter uppercase
+       # print('. '.join(a))
+        desc.append('. '.join(a))
+    desc = desc[:2]
     return desc
 
 def write_to_folder(filename, list1, path):
@@ -135,6 +143,8 @@ if __name__ == "__main__":
     # Input files
     filename1 = str(input())
     filename2 = str(input())
+    #filename1 = 'File1.txt'
+   # filename2 = 'File2.txt'
     file_with_text = open(filename1, "r", encoding="utf-8")
     file_with_stop_words = open(filename2, "r", encoding="utf-8")
 
@@ -143,11 +153,12 @@ if __name__ == "__main__":
     stop_words = tuple(stop_words)
 
     # Main
+
     list1 = format(file_with_text)
     headers_3 = headers(list1)  # 3 headers , len <30
+    print("Заголовоки: ", headers_3)
     small_texts = descriptions(list1, headers_3)  # 2 small texts , len <90
     keys = [] # 2-3 Keys, 2 words
-    print("Заголовоки: ", headers_3)
     print("Описание: ", small_texts)
 
     # Get Time, Create Name of the Folder "день_месяц_год час_минута_секунда"
@@ -164,11 +175,7 @@ if __name__ == "__main__":
 
     # Create folder
     folder = create_dir(t)
-    
+
     # save titles_file, titles_file
     write_to_folder(titles_file, headers_3, folder)
     write_to_folder(descriptions_file, small_texts, folder)
-
-
-
-
