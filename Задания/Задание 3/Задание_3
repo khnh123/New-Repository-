@@ -1,6 +1,7 @@
 import re
 import os
 from datetime import datetime
+import random
 
 def format(file_with_text):
     """
@@ -11,13 +12,13 @@ def format(file_with_text):
     for x in file_with_text:
         x = re.split(r'(?<=[\.\!\?])\s*', x)
         list1.append(x)
-            #for e in range(len(list1)):
+            # for e in range(len(list1)):
             #    list1[e] = list1[e].replace('\n', "")
     return list1
 
 def check(lista):
     """
-    String does not starts with words in stop_words
+    Check if string  in stop_words
     """
     lista = [i for i in lista if i]
     index = 0
@@ -48,23 +49,25 @@ def headers(list1):
     """
     temp = []
     for i in list1:
-        i = ''.join(i)
-        s2 = check(i.split(' '))
-        header_tmp = []
-        for word in s2:
-            check_word = re.findall(r'\b\w+\b', word)
-            if len(check_word) > 0:
-                if check_word[0].lower() not in stop_words:
-                    if (len(''.join(header_tmp)) + len(check_word[0])) < 30:
-                        header_tmp.append(word)
-        if len(temp) >= 3:  # need 3 headers
-            return temp
-        if len(' '.join(header_tmp)) > 0:
-            temp.append(' '.join(header_tmp))
+        for i2 in i:
+            s2 = check(i2.split(' '))
+            header_tmp = []
+            for word in s2:
+                check_word = re.findall(r'\b\w+\b', word)
+                if len(check_word) > 0:
+                    if check_word[0].lower() not in stop_words:
+                        if (len(''.join(header_tmp)) + len(check_word[0])) < 30:
+                            header_tmp.append(word)
+                        else:
+                            break
+            if len(temp) >= 3:  # need 3 headers
+                return temp
+            if len(' '.join(header_tmp)) > 0:
+                temp.append(' '.join(header_tmp))
     return temp
 
 
-def header_indexes(headers_3):
+def header_indexes(headers_3, list1):
     """
     Find the start indexes of headers
     return list if start indexes
@@ -81,7 +84,7 @@ def descriptions(list1, headers_3):
     """
     desc = []
     text = split_text(list1)
-    indexes = header_indexes(headers_3) # need start index of the header in text
+    indexes = header_indexes(headers_3, list1) # need start index of the header in text
     loc = indexes[0]
     for index in indexes:
         if index < loc: # descriptions do not intersect
@@ -129,6 +132,50 @@ def create_dir(folder_name):
     return final_directory
 
 
+def pair_of_words(file):
+    """
+    Create pair of words
+    :param file:
+    :return: all_words1
+    """
+    all_words = []
+    for x in file:
+        all_words += x.split(' ')
+    all_words = [re.findall(r'\b\w+\b', word) for word in all_words]
+    all_words1 = []
+    for i in range(len(all_words)-1):
+        all_words1.append(" ".join(all_words[i] + all_words[i+1]))
+    all_words1.append('Доставка цветов')
+    all_words1.append('выберите композицию')
+    all_words1.append('выберите композицию')
+    return all_words1
+
+def gen_keys(list1):
+    """
+
+    :param list1:
+    :return: list with keys
+    """
+    dict1 = {}
+    for w in list1:
+        dict1[w] = list1.count(w)
+    a = [x for x in dict1.values()]
+    keys = []
+    # Find maximums
+    while len(keys) != 2:
+        if max(a) == 1:
+            keys = random.sample(list1, 2)
+        else:
+            # taking list of car values in v
+            v = list(dict1.values())
+            # taking list of car keys in v
+            k = list(dict1.keys())
+            max1 = k[v.index(max(v))]
+            keys.append(max1)
+            del dict1[max1]
+    return keys
+
+
 if __name__ == "__main__":
     """
      Заголовок 1 - Доставка цветов осуществляется
@@ -144,7 +191,7 @@ if __name__ == "__main__":
     filename1 = str(input())
     filename2 = str(input())
     #filename1 = 'File1.txt'
-   # filename2 = 'File2.txt'
+    #filename2 = 'File2.txt'
     file_with_text = open(filename1, "r", encoding="utf-8")
     file_with_stop_words = open(filename2, "r", encoding="utf-8")
 
@@ -153,13 +200,15 @@ if __name__ == "__main__":
     stop_words = tuple(stop_words)
 
     # Main
-
     list1 = format(file_with_text)
+
     headers_3 = headers(list1)  # 3 headers , len <30
     print("Заголовоки: ", headers_3)
     small_texts = descriptions(list1, headers_3)  # 2 small texts , len <90
-    keys = [] # 2-3 Keys, 2 words
     print("Описание: ", small_texts)
+    pairs = pair_of_words(file_with_text)
+    keys = gen_keys(pairs) # 2-3 Keys, 2 words
+    print("Ключи: ", keys)
 
     # Get Time, Create Name of the Folder "день_месяц_год час_минута_секунда"
     t = datetime.now()
@@ -179,3 +228,7 @@ if __name__ == "__main__":
     # save titles_file, titles_file
     write_to_folder(titles_file, headers_3, folder)
     write_to_folder(descriptions_file, small_texts, folder)
+
+
+
+
