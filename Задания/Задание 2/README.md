@@ -18,9 +18,10 @@
 5. Opens review form
 6. Fills in the review form
 7. Presses submit
+---
 
 ### Functions, Files
----
+
 Задание_2.py
 - is_valid_email(email) -  check if email is valid
 - user_input() - Takes User Input, returns list 
