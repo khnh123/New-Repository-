@@ -22,7 +22,7 @@
 
 ### Functions, Files
 
-Задание_2.py
+Задание_2.py:
 - is_valid_email(email) -  check if email is valid
 - user_input() - Takes User Input, returns list 
 - listToDict(list1) - converts list to dict, coloms are predefined 
