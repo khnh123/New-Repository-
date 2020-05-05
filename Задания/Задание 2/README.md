@@ -6,7 +6,9 @@
 
 Задание 2
 1. takes user's input
+
 //2. Adds data to DataFrame
+
 //3. Appends Dataframe to .csv file
 
 2. finds name of the exchanger in the database
