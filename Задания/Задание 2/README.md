@@ -3,6 +3,11 @@
 ![Screenshot_1](https://user-images.githubusercontent.com/48917675/81112680-e3d74100-8ed3-11ea-854b-675da3414e97.jpg)
 
 ---
+### Install 
+1. Need chromedriver_win32 to run selenium webdriver.Chrome()
+https://chromedriver.chromium.org/downloads
+
+---
 ### Run
 
 Задание 2
